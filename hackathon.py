@@ -4,6 +4,8 @@ import json
 from datetime import datetime
 from configparser import SafeConfigParser
 
+from drive_helpers import main_quickstart
+
 
 """
 Read in and parse config options
@@ -45,6 +47,10 @@ def get_tf_pr():
 				mimetype='application/json'
 		)
 	return response
+
+@app.route("/shriya-test")
+def shriya_test():
+  return main_quickstart()
 
 @app.route("/standup", methods=['GET', 'POST'])
 def slash_command():
