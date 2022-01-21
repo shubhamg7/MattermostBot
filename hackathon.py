@@ -31,7 +31,7 @@ def slash_2():
 def get_tf_pr():
 	form_text = request.form["text"]
 	if len(form_text) > 0:
-		output = "[Terraform PR](https://github.com/Affirm/terraffirm/pull/{})".format(form_text)
+		output = "[TF PR{}](https://github.com/Affirm/terraffirm/pull/{})".format(form_text, form_text)
 		data = {
 			"response_type": "in_channel",
 			"text": output
