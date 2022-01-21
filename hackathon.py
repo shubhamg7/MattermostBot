@@ -22,7 +22,29 @@ app = Flask(__name__)
 
 @app.route("/test")
 def slash_2():
-  return "hello"
+	return "hello"
+
+
+@app.route("/TF", methods=['POST'])
+def get_tf_pr():
+	form_text = request.form["text"]
+	if len(form_text) > 0:
+		output = "[Terraform PR](https://github.com/Affirm/terraffirm/pull/{})".format(form_text)
+		data = {
+			"response_type": "in_channel",
+			"text": output
+		}
+	else:
+		data = {
+			"response_type": "ephemeral",
+			"text": "Error: No status message entered. Please try again.",
+			}
+	response = app.response_class(
+				response=json.dumps(data),
+				status=200,
+				mimetype='application/json'
+		)
+	return response
 
 @app.route("/standup", methods=['GET', 'POST'])
 def slash_command():
