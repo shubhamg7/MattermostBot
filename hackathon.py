@@ -6,6 +6,24 @@ from configparser import SafeConfigParser
 
 from drive_helpers import main_quickstart
 
+from __future__ import print_function
+
+import os.path
+
+from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
+from google.oauth2 import service_account
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
+
+# If modifying these scopes, delete the file token.json.
+SCOPES = ['https://www.googleapis.com/auth/documents', 'https://www.googleapis.com/auth/drive.file']
+
+# The ID of a sample document.
+DOCUMENT_ID = '195j9eDD3ccgjQRttHhJPymLJUCOUjs-jmwTrekvdjFE'
+SERVICE_ACCOUNT_FILE = 'service-account.json'
+
 
 """
 Read in and parse config options
@@ -25,6 +43,75 @@ app = Flask(__name__)
 @app.route("/test")
 def slash_2():
 	return "hello"
+
+@app.route("/save")
+def save_to_docs():
+	creds = service_account.Credentials.from_service_account_file(
+        SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+
+    try:
+        service = build('docs', 'v1', credentials=creds)
+        # drive_service = build('drive', 'v3', credentials=creds)
+
+        # Retrieve the documents contents from the Docs service.
+        # document = service.documents().get(documentId=DOCUMENT_ID).execute()
+        print("Service starting")
+
+        # print('The title of the document is: {}'.format(document.get('title')))
+
+        # title = 'My Document'
+        # body = {
+        #     'title': title
+        # }
+        # doc = service.documents() \
+        #     .create(body=body).execute()
+        # print('Created document with title: {0}'.format(
+        #     doc.get('title')))
+        # documentId = doc.get('documentId')
+        text_from_user = "NewNew"
+        text_to_insert = "{}\n".format(text_from_user)
+        requests = [
+            {
+                'insertText': {
+                    'location': {
+                        'index': 1,
+                    },
+                    'text': text_to_insert
+                }
+            },
+        ]
+        documentId = '1WYbL7QHcEo-_Asq_YBFAldiVNS2SBOiH9MCvLfec97A'
+        
+
+        result = service.documents().batchUpdate(
+            documentId=documentId, body={'requests': requests}).execute()
+        print("Wrote to doc {}".format(documentId))
+
+        """
+        The following code is used to add permissions to a file
+        """
+        # def callback(request_id, response, exception):
+        #     if exception:
+        #         # Handle error
+        #         print (exception)
+        #     else:
+        #         print ("Permission Id: {}".format(response.get('id')))
+
+        # batch = drive_service.new_batch_http_request(callback=callback)
+        # user_permission = {
+        #     'type': 'user',
+        #     'role': 'writer',
+        #     'emailAddress': 'kevin.cottington@affirm.com'
+        # }
+        # batch.add(drive_service.permissions().create(
+        #         fileId='1WYbL7QHcEo-_Asq_YBFAldiVNS2SBOiH9MCvLfec97A',
+        #         body=user_permission,
+        #         fields='id',
+        # ))
+        # batch.execute()
+    except HttpError as err:
+        print(err)
+    return "Saved to https://docs.google.com/document/d/1WYbL7QHcEo-_Asq_YBFAldiVNS2SBOiH9MCvLfec97A/edit"
 
 
 @app.route("/TF", methods=['POST'])
